@@ -1,0 +1,22 @@
+html,
+body {
+	height: auto;
+}
+
+#root {
+	min-height: 100%;
+}
+
+body {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+@keyframes scan {
+	0% {
+		transform: translateY(-60%);
+	}
+	100% {
+		transform: translateY(60%);
+	}
+}

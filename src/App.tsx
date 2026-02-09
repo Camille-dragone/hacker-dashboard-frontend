@@ -1,9 +1,14 @@
-import './App.css'
+import { Outlet } from "react-router-dom";
+import Sidebar from "./component/Sidebar";
 
 export default function App() {
-  return (
-    <div className="min-h-screen bg-black text-green-400 flex items-center justify-center font-mono">
-      <h1 className="text-4xl">Hacker</h1>
-    </div>
-  );
+	return (
+		<div className="flex bg-black">
+			<Sidebar />
+
+			<main className="relative flex-1 overflow-visible">
+				<Outlet />
+			</main>
+		</div>
+	);
 }
