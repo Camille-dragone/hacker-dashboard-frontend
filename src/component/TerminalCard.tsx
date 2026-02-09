@@ -489,7 +489,7 @@ export function TerminalCard() {
 	}, [lines, started]);
 
 	return (
-		<GlassCard className="w-full max-w-[800px]">
+		<GlassCard className="w-full max-w-[1800px]">
 			<div className="p-6">
 				<TerminalHeader
 					started={started}
