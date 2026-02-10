@@ -12,7 +12,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const EXPECTED_PASSWORD = "a9F#3KxQ";
-  const [user] = useState("hacker");
+  const [user] = useState("Camille-hacker");
   const [pass, setPass] = useState("");
   const [phase, setPhase] = useState<"idle" | "verifying" | "granted" | "denied">(
     "idle",

@@ -17,6 +17,8 @@ import {
 import { Card, Modal } from "../component/target/TargetUI";
 import { apiFetch } from "../lib/api";
 
+import { ConfirmDelete } from "../component/target/ConfirmDelete";
+
 export default function Target() {
 	const [items, setItems] = useState<Entreprise[]>([]);
 	const [loading, setLoading] = useState(false);
@@ -45,6 +47,11 @@ export default function Target() {
 	const [selectedId, setSelectedId] = useState<number | null>(null);
 	const [logs, setLogs] = useState<LogOut[]>([]);
 	const [logsLoading, setLogsLoading] = useState(false);
+
+
+	const [deleteOpen, setDeleteOpen] = useState(false);
+	const [deleteLoading, setDeleteLoading] = useState(false);
+	const [deleteTarget, setDeleteTarget] = useState<Entreprise | null>(null);
 
 	const selected = useMemo(() => {
 		if (selectedId == null) return null;
@@ -84,9 +91,7 @@ export default function Target() {
 	const refreshLogs = useCallback(async (entrepriseId: number) => {
 		setLogsLoading(true);
 		try {
-			const data = await apiFetch<LogOut[]>(
-				`/entreprises/${entrepriseId}/logs`,
-			);
+			const data = await apiFetch<LogOut[]>(`/entreprises/${entrepriseId}/logs`);
 			setLogs(data.slice(0, 30));
 		} catch {
 			setLogs([]);
@@ -149,32 +154,43 @@ export default function Target() {
 		}
 	}, [canSubmit, mode, editing, form, refreshList]);
 
-	const remove = useCallback(
-		async (ent: Entreprise) => {
-			const ok = window.confirm(
-				`Supprimer "${ent.nom}" ? Cette action est irréversible.`,
-			);
-			if (!ok) return;
+	const askRemove = useCallback((ent: Entreprise) => {
+		setDeleteTarget(ent);
+		setDeleteOpen(true);
+	}, []);
 
-			setErr(null);
-			try {
-				await apiFetch<{ message: string }>(`/entreprises/${ent.id}`, {
-					method: "DELETE",
-				});
+	const cancelRemove = useCallback(() => {
+		if (deleteLoading) return;
+		setDeleteOpen(false);
+	}, [deleteLoading]);
 
-				if (selectedId === ent.id) {
-					setSelectedId(null);
-					setLogs([]);
-					setDetailsOpen(false);
-				}
+	const confirmRemove = useCallback(async () => {
+		if (!deleteTarget) return;
 
-				await refreshList();
-			} catch (e: unknown) {
-				setErr(e instanceof Error ? e.message : "Erreur");
+		setDeleteLoading(true);
+		setErr(null);
+
+		try {
+			await apiFetch<{ message: string }>(`/entreprises/${deleteTarget.id}`, {
+				method: "DELETE",
+			});
+
+			if (selectedId === deleteTarget.id) {
+				setSelectedId(null);
+				setLogs([]);
+				setDetailsOpen(false);
 			}
-		},
-		[refreshList, selectedId],
-	);
+
+			setDeleteOpen(false);
+			setDeleteTarget(null);
+
+			await refreshList();
+		} catch (e: unknown) {
+			setErr(e instanceof Error ? e.message : "Erreur");
+		} finally {
+			setDeleteLoading(false);
+		}
+	}, [deleteTarget, refreshList, selectedId]);
 
 	const hackedAt = useMemo(() => {
 		if (!selected) return null;
@@ -243,7 +259,7 @@ export default function Target() {
 								void refreshLogs(ent.id);
 							}}
 							onEdit={(ent) => openEdit(ent)}
-							onRemove={(ent) => void remove(ent)}
+							onRemove={(ent) => askRemove(ent)}
 						/>
 
 						<TargetPagination
@@ -283,6 +299,13 @@ export default function Target() {
 					onSubmit={() => void submit()}
 				/>
 			</Modal>
+			<ConfirmDelete
+				open={deleteOpen}
+				targetName={deleteTarget?.nom ?? ""}
+				loading={deleteLoading}
+				onCancel={cancelRemove}
+				onConfirm={() => void confirmRemove()}
+			/>
 		</div>
 	);
 }
