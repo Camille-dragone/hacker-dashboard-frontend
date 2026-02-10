@@ -5,37 +5,40 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
 import App from "./App";
+import Matrix from "./pages/Matrix";
 import Dashboard from "./pages/Dashboard";
-import Landing from "./pages/Landing";
 import Target from "./pages/Target";
 
 const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <App />,
-		children: [
-			{
-				path: "/",
-				element: <Landing />,
-			},
-			{
-				path: "/dashboard",
-				element: <Dashboard />,
-			},
-			{
-				path: "/targets",
-				element: <Target />,
-			},
-		],
-	},
+  // ✅ Page d’entrée “Matrix” SANS sidebar
+  {
+    path: "/",
+    element: <Matrix />,
+  },
+
+  // ✅ Le reste du site AVEC sidebar (App.tsx)
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/targets",
+        element: <Target />,
+      },
+    ],
+  },
 ]);
 
 const rootElement = document.getElementById("root");
 if (!rootElement)
-	throw new Error(`Your HTML Document should contain a <div id="root"></div>`);
+  throw new Error(`Your HTML Document should contain a <div id="root"></div>`);
 
 createRoot(rootElement).render(
-	<StrictMode>
-		<RouterProvider router={router} />
-	</StrictMode>,
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>,
 );
