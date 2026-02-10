@@ -282,7 +282,7 @@ export function TerminalCard() {
 			try {
 				const list = await apiFetch<
 					Array<{ id: number; nom?: string; name?: string }>
-				>("/entreprises?limit=250");
+				>("/entreprises?limit=250&statut=analyse");
 
 				if (cancelled) return;
 

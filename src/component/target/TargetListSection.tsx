@@ -98,7 +98,7 @@ export function TargetTable({
 						<th className="px-4 py-3 w-[130px]">Accès</th>
 						<th className="px-4 py-3 w-[240px]">Vulnérabilité</th>
 						<th className="px-4 py-3 w-[160px]">Statut</th>
-						<th className="px-4 py-3 w-[220px]">Threat Level</th>
+						<th className="px-4 py-3 w-[220px]">Niveau menace</th>
 						<th className="px-4 py-3 w-[220px] text-right">Actions</th>
 					</tr>
 				</thead>

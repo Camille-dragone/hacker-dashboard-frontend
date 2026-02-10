@@ -137,7 +137,7 @@ export function TargetDetailsOverlay({
               onClick={onClose}
               className="rounded-full border px-3 py-2 text-xs uppercase tracking-widest border-green-500/20 bg-black/40 text-green-300/80 hover:border-green-400/40 hover:text-green-200"
             >
-              Fermer
+              X
             </button>
           </div>
         </div>
