@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-type Hot = { col: number; y: number }; 
+type Hot = { col: number; y: number };
 
 export default function Matrix() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -10,11 +10,10 @@ export default function Matrix() {
   const cfg = useMemo(
     () => ({
       fontSize: 22,
-
       fade: 0.08,
 
       greenSpeedMin: 0.9,
-      greenSpeedMax: 0.22,
+      greenSpeedMax: 2.2,
 
       redSpeedMin: 0.03,
       redSpeedMax: 0.05,
@@ -32,10 +31,8 @@ export default function Matrix() {
   const colsRef = useRef(0);
   const rowsRef = useRef(0);
 
-  const hotARef = useRef<Hot>({ col: 0, y: 0 });
-  const hotBRef = useRef<Hot>({ col: 0, y: 0 });
-  const hotASpeedRef = useRef(0.08);
-  const hotBSpeedRef = useRef(0.08);
+  const hotRef = useRef<Hot>({ col: 0, y: 0 });
+  const hotSpeedRef = useRef(0.04);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -46,12 +43,12 @@ export default function Matrix() {
 
     const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
-    const placeHots = (cols: number, rows: number) => {
-      hotARef.current = { col: Math.max(2, Math.min(cols - 3, Math.floor(cols * 0.62))), y: rows * 0.15 };
-      hotBRef.current = { col: Math.max(2, Math.min(cols - 3, Math.floor(cols * 0.35))), y: rows * 0.35 };
-
-      hotASpeedRef.current = rand(cfg.redSpeedMin, cfg.redSpeedMax);
-      hotBSpeedRef.current = rand(cfg.redSpeedMin, cfg.redSpeedMax);
+    const placeHot = (cols: number, rows: number) => {
+      hotRef.current = {
+        col: Math.floor(Math.random() * cols),
+        y: Math.random() * rows, 
+      };
+      hotSpeedRef.current = rand(cfg.redSpeedMin, cfg.redSpeedMax);
     };
 
     const resize = () => {
@@ -77,7 +74,7 @@ export default function Matrix() {
         rand(cfg.greenSpeedMin, cfg.greenSpeedMax),
       );
 
-      placeHots(cols, rows);
+      placeHot(cols, rows);
     };
 
     resize();
@@ -115,32 +112,24 @@ export default function Matrix() {
 
       const stepHot = (hot: Hot, speed: number) => {
         hot.y += speed;
+
         if (hot.y > rows + 2) {
-          hot.y = -2;
-
-          const c = colsRef.current;
-          const newCol =
-            Math.random() < 0.5
-              ? hot.col + 1
-              : hot.col - 1;
-
-          hot.col = Math.max(2, Math.min(c - 3, newCol));
+          hot.y = -2 - Math.random() * 8; 
+          hot.col = Math.floor(Math.random() * cols); 
+          hotSpeedRef.current = rand(cfg.redSpeedMin, cfg.redSpeedMax);
         }
       };
 
-      stepHot(hotARef.current, hotASpeedRef.current);
-      stepHot(hotBRef.current, hotBSpeedRef.current);
+      stepHot(hotRef.current, hotSpeedRef.current);
 
       ctx.fillStyle = cfg.red;
-
       const drawHot = (hot: Hot) => {
         const x = hot.col * cfg.fontSize;
         const y = Math.floor(hot.y) * cfg.fontSize;
         ctx.fillText("1", x, y);
       };
 
-      drawHot(hotARef.current);
-      drawHot(hotBRef.current);
+      drawHot(hotRef.current);
 
       raf = requestAnimationFrame(tick);
     };
@@ -165,8 +154,8 @@ export default function Matrix() {
       return Math.abs(col - h.col) <= r && Math.abs(row - hRow) <= r;
     };
 
-    if (hit(hotARef.current) || hit(hotBRef.current)) {
-      navigate("/dashboard");
+    if (hit(hotRef.current)) {
+      navigate("/login");
     }
   };
 
