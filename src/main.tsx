@@ -12,11 +12,9 @@ import Matrix from "./pages/Matrix";
 import Login from "./pages/Login";
 
 const router = createBrowserRouter([
-  // ✅ pages publiques (sans App/Sidebar)
   { path: "/", element: <Matrix /> },
   { path: "/login", element: <Login /> },
 
-  // ✅ app privée (avec Sidebar via App.tsx)
   {
     path: "/",
     element: <App />,
