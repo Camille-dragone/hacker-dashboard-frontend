@@ -282,12 +282,6 @@ export default function Login() {
             </div>
 
             <div className="mt-4 text-green-300/70">
-              {phase === "idle" && (
-                  <div>
-                    <span className="text-green-400">{">"}</span> Type password,
-                    press ENTER.
-                  </div>
-              )}
               {phase === "verifying" && (
                 <div>
                   <span className="text-green-400">{">"}</span> VERIFYING…

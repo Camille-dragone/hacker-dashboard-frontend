@@ -106,7 +106,7 @@ export default function Dashboard() {
 
             <div className="mt-4 text-xs text-green-300/70">
               <span className="text-green-400">{">"}</span> Session:{" "}
-              <span className="text-green-300">camille@hacker.com</span>
+              <span className="text-green-300">camillebujotzek@hacker.com</span>
             </div>
           </div>
 
