@@ -10,12 +10,12 @@ import {
 import { CARD_TITLE_CLASS, GlassCard } from "./DashboardShell";
 
 export type PieDatumName =
-  | "Compromises"
-  | "En Analyse"
-  | "Sécurisées"
-  | "Breached"
-  | "Locked"
-  | "Scanning";
+	| "Compromises"
+	| "En Analyse"
+	| "Sécurisées"
+	| "Breached"
+	| "Locked"
+	| "Scanning";
 
 export type PieDatum = { name: PieDatumName; value: number };
 

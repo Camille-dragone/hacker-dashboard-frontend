@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ConfirmDelete } from "../component/target/ConfirmDelete";
 import { TargetDetailsOverlay } from "../component/target/TargetDetailsOverlay";
-
 import {
 	type Entreprise,
 	type EntrepriseCreate,
@@ -16,8 +16,6 @@ import {
 } from "../component/target/TargetListSection";
 import { Card, Modal } from "../component/target/TargetUI";
 import { apiFetch } from "../lib/api";
-
-import { ConfirmDelete } from "../component/target/ConfirmDelete";
 
 export default function Target() {
 	const [items, setItems] = useState<Entreprise[]>([]);
@@ -47,7 +45,6 @@ export default function Target() {
 	const [selectedId, setSelectedId] = useState<number | null>(null);
 	const [logs, setLogs] = useState<LogOut[]>([]);
 	const [logsLoading, setLogsLoading] = useState(false);
-
 
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [deleteLoading, setDeleteLoading] = useState(false);
@@ -91,7 +88,9 @@ export default function Target() {
 	const refreshLogs = useCallback(async (entrepriseId: number) => {
 		setLogsLoading(true);
 		try {
-			const data = await apiFetch<LogOut[]>(`/entreprises/${entrepriseId}/logs`);
+			const data = await apiFetch<LogOut[]>(
+				`/entreprises/${entrepriseId}/logs`,
+			);
 			setLogs(data.slice(0, 30));
 		} catch {
 			setLogs([]);
