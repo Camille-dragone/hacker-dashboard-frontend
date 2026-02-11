@@ -4,9 +4,9 @@ import IndiceLogin from "../component/IndiceLogin";
 
 type RedDrop = {
 	char: string;
-	col: number; 
-	y: number; 
-	speed: number; 
+	col: number;
+	y: number;
+	speed: number;
 };
 
 export default function Login() {
@@ -81,7 +81,7 @@ export default function Login() {
 
 	const matrixCfg = useMemo(
 		() => ({
-			greenFontSize: 24, 
+			greenFontSize: 24,
 			redFontSize: 38,
 
 			fade: 0.035,
@@ -178,7 +178,10 @@ export default function Login() {
 			colsRef.current = cols;
 			rowsRef.current = rows;
 
-			dropsRef.current = Array.from({ length: cols }, () => Math.random() * rows);
+			dropsRef.current = Array.from(
+				{ length: cols },
+				() => Math.random() * rows,
+			);
 			speedsRef.current = Array.from({ length: cols }, () =>
 				rand(matrixCfg.greenSpeedMin, matrixCfg.greenSpeedMax),
 			);
@@ -191,7 +194,10 @@ export default function Login() {
 			if (colsRef.current <= 0) return;
 
 			if (injectIndexRef.current === 0) {
-				cycleSpeedRef.current = rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax);
+				cycleSpeedRef.current = rand(
+					matrixCfg.redSpeedMin,
+					matrixCfg.redSpeedMax,
+				);
 			}
 
 			const idx = injectIndexRef.current;
@@ -199,8 +205,8 @@ export default function Login() {
 
 			redDropsRef.current.push({
 				char,
-				col: Math.floor(Math.random() * colsRef.current), 
-				y: -4, 
+				col: Math.floor(Math.random() * colsRef.current),
+				y: -4,
 				speed:
 					cycleSpeedRef.current ??
 					rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax),

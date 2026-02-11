@@ -192,13 +192,15 @@ function TerminalBody({
 
 			{started && loading && (
 				<div className="text-green-300/70">
-					<span className="text-green-400">{">"}</span> Synchronisation des logs…
+					<span className="text-green-400">{">"}</span> Synchronisation des
+					logs…
 				</div>
 			)}
 
 			{started && !loading && lines.length === 0 && (
 				<div className="text-green-300/70">
-					<span className="text-green-400">{">"}</span> Aucun log pour l’instant.
+					<span className="text-green-400">{">"}</span> Aucun log pour
+					l’instant.
 				</div>
 			)}
 
@@ -306,7 +308,9 @@ export function TerminalCard({
 
 				setEntreprises(opts);
 
-				setTargetId((prev) => (prev != null && !opts.some((o) => o.id === prev) ? null : prev));
+				setTargetId((prev) =>
+					prev != null && !opts.some((o) => o.id === prev) ? null : prev,
+				);
 			} catch {
 				if (!cancelled) setEntreprises([]);
 			}
@@ -378,9 +382,7 @@ export function TerminalCard({
 
 		const interval = window.setInterval(async () => {
 			try {
-				const fresh = await apiFetch<LogOut[]>(
-					`/entreprises/${targetId}/logs`,
-				);
+				const fresh = await apiFetch<LogOut[]>(`/entreprises/${targetId}/logs`);
 				if (cancelled) return;
 				if (runId !== runIdRef.current) return;
 
@@ -400,7 +402,7 @@ export function TerminalCard({
 	}, [started, targetId]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-		useEffect(() => {
+	useEffect(() => {
 		if (!started) return;
 
 		setLines((prev) => {

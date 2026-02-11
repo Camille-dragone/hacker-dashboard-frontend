@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 type Step = {
 	text: string;
-	ms: number; 
-	progressTo: number; 
+	ms: number;
+	progressTo: number;
 };
 
 function clamp(n: number, a: number, b: number) {
@@ -16,8 +16,16 @@ export default function Logout() {
 
 	const steps: Step[] = useMemo(
 		() => [
-			{ text: "PURGE ▸ destruction des jetons de session…", ms: 850, progressTo: 18 },
-			{ text: "PURGE ▸ nettoyage complet du cache local…", ms: 750, progressTo: 34 },
+			{
+				text: "PURGE ▸ destruction des jetons de session…",
+				ms: 850,
+				progressTo: 18,
+			},
+			{
+				text: "PURGE ▸ nettoyage complet du cache local…",
+				ms: 750,
+				progressTo: 34,
+			},
 			{ text: "PURGE ▸ coupure des tunnels actifs…", ms: 850, progressTo: 52 },
 			{ text: "TOR ▸ reconfiguration du circuit…", ms: 900, progressTo: 70 },
 			{ text: "TOR ▸ circuit neutralisé.", ms: 800, progressTo: 82 },
@@ -84,7 +92,7 @@ export default function Logout() {
 		const anim = (t: number) => {
 			const elapsed = t - start;
 			const k = clamp(elapsed / dur, 0, 1);
-			const eased = 1 - Math.pow(1 - k, 3); 
+			const eased = 1 - (1 - k) ** 3;
 			const val = from + (to - from) * eased;
 			setProgress(Math.round(val));
 			if (k < 1) requestAnimationFrame(anim);
@@ -106,7 +114,7 @@ export default function Logout() {
 		}, current.ms + 420);
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [stepIndex, current?.text]); 
+	}, [stepIndex, current?.text]);
 
 	return (
 		<div className="min-h-screen bg-black font-mono relative overflow-hidden">
@@ -129,7 +137,8 @@ export default function Logout() {
 						PROTOCOLE DE PURGE ACTIVÉ
 					</div>
 					<div className="mt-3 text-xs uppercase tracking-widest text-green-300/70">
-						<span className="text-green-400">{">"}</span> Fin de session - évacuation sécurisée en cours ...  
+						<span className="text-green-400">{">"}</span> Fin de session -
+						évacuation sécurisée en cours ...
 					</div>
 				</div>
 
@@ -151,11 +160,13 @@ export default function Logout() {
 					<div className="mt-3 text-[11px] text-green-300/60">
 						{progress < 100 ? (
 							<>
-								<span className="text-green-400">{">"}</span> Ne pas interrompre ...
+								<span className="text-green-400">{">"}</span> Ne pas interrompre
+								...
 							</>
 						) : (
 							<>
-								<span className="text-green-400">{">"}</span> Redirecting to home…
+								<span className="text-green-400">{">"}</span> Redirecting to
+								home…
 							</>
 						)}
 					</div>

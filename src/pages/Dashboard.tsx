@@ -97,7 +97,9 @@ export default function Dashboard() {
 
 						<div className="mt-4 text-xs text-green-300/70">
 							<span className="text-green-400">{">"}</span> Session:{" "}
-							<span className="text-green-300">camillebujotzek@hacker.com</span>
+							<span className="text-green-300">
+								camillebujotzek02@gmail.com
+							</span>
 						</div>
 					</div>
 
@@ -117,7 +119,8 @@ export default function Dashboard() {
 							</div>
 
 							<div className="mt-1 text-xs text-green-300/70">
-								Dernière action : {formatTime(statsA?.dernier_log.created_at ?? null)}
+								Dernière action :{" "}
+								{formatTime(statsA?.dernier_log.created_at ?? null)}
 							</div>
 						</div>
 					</div>
@@ -165,7 +168,6 @@ export default function Dashboard() {
 					</div>
 
 					<div className="flex justify-center">
-						{/* ✅ quand le terminal finit, on reload les stats */}
 						<TerminalCard onTargetsChanged={() => void reload()} />
 					</div>
 				</div>
