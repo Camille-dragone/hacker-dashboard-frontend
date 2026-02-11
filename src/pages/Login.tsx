@@ -187,36 +187,41 @@ export default function Login() {
 		resize();
 		window.addEventListener("resize", resize);
 
-const injectTimer = window.setInterval(() => {
-	if (colsRef.current <= 0) return;
+		const injectTimer = window.setInterval(() => {
+			if (colsRef.current <= 0) return;
 
-	if (injectIndexRef.current === 0) {
-		cycleSpeedRef.current = rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax);
-	}
+			if (injectIndexRef.current === 0) {
+				cycleSpeedRef.current = rand(
+					matrixCfg.redSpeedMin,
+					matrixCfg.redSpeedMax,
+				);
+			}
 
-	const idx = injectIndexRef.current;
-	const char = matrixCfg.injectedPassword[idx];
+			const idx = injectIndexRef.current;
+			const char = matrixCfg.injectedPassword[idx];
 
-	redDropsRef.current.push({
-		char,
-		col: Math.floor(Math.random() * colsRef.current),
-		y: -4,
-		speed: cycleSpeedRef.current ?? rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax),
-	});
+			redDropsRef.current.push({
+				char,
+				col: Math.floor(Math.random() * colsRef.current),
+				y: -4,
+				speed:
+					cycleSpeedRef.current ??
+					rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax),
+			});
 
-	injectIndexRef.current += 1;
+			injectIndexRef.current += 1;
 
-	if (injectIndexRef.current >= matrixCfg.injectedPassword.length) {
-		injectIndexRef.current = 0;
-	}
+			if (injectIndexRef.current >= matrixCfg.injectedPassword.length) {
+				injectIndexRef.current = 0;
+			}
 
-	if (redDropsRef.current.length > matrixCfg.maxRedDrops) {
-		redDropsRef.current.splice(
-			0,
-			redDropsRef.current.length - matrixCfg.maxRedDrops,
-		);
-	}
-}, matrixCfg.injectEveryMs);
+			if (redDropsRef.current.length > matrixCfg.maxRedDrops) {
+				redDropsRef.current.splice(
+					0,
+					redDropsRef.current.length - matrixCfg.maxRedDrops,
+				);
+			}
+		}, matrixCfg.injectEveryMs);
 
 		let raf = 0;
 
