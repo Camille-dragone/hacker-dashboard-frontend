@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState , useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import IndiceLogin from "../component/IndiceLogin";
 
@@ -15,21 +15,19 @@ export default function Login() {
 	const EXPECTED_PASSWORD = "MaTrIx";
 	const [user] = useState("Camille-hacker");
 	const [pass, setPass] = useState("");
-	const [phase, setPhase] = useState<"idle" | "verifying" | "granted" | "denied">(
-		"idle",
-	);
+	const [phase, setPhase] = useState<
+		"idle" | "verifying" | "granted" | "denied"
+	>("idle");
 
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const focusPass = useCallback(() => {
-	requestAnimationFrame(() => inputRef.current?.focus());
-}, []);
+		requestAnimationFrame(() => inputRef.current?.focus());
+	}, []);
 
 	const [deniedFx, setDeniedFx] = useState(false);
 
-	// écran d'intro “IndiceLogin”
 	const [showIndice, setShowIndice] = useState(true);
 
-	// modale indices
 	const [showHint, setShowHint] = useState(false);
 	const [hintIndex, setHintIndex] = useState(0);
 
@@ -47,10 +45,10 @@ export default function Login() {
 		setHintIndex((i) => (i + 1) % HINTS.length);
 	};
 
-const closeHint = useCallback(() => {
-	setShowHint(false);
-	focusPass();
-}, [focusPass]);
+	const closeHint = useCallback(() => {
+		setShowHint(false);
+		focusPass();
+	}, [focusPass]);
 
 	const uiCfg = useMemo(
 		() => ({
@@ -63,20 +61,20 @@ const closeHint = useCallback(() => {
 		}),
 		[],
 	);
-useEffect(() => {
-	focusPass();
-}, [focusPass]);
+	useEffect(() => {
+		focusPass();
+	}, [focusPass]);
 
-useEffect(() => {
-	if (!showHint) return;
+	useEffect(() => {
+		if (!showHint) return;
 
-	const onKeyDown = (e: KeyboardEvent) => {
-		if (e.key === "Escape") closeHint();
-	};
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") closeHint();
+		};
 
-	window.addEventListener("keydown", onKeyDown);
-	return () => window.removeEventListener("keydown", onKeyDown);
-}, [showHint, closeHint]);
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [showHint, closeHint]);
 
 	const canSubmit = pass.trim().length > 0 && phase === "idle";
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -340,7 +338,6 @@ useEffect(() => {
 			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.90)_100%)]" />
 
 			<div className="absolute inset-0 flex items-center justify-center p-6">
-				{/* ✅ panneau = vrai bouton (semantic) => plus d'erreurs a11y */}
 				<button
 					type="button"
 					onMouseDown={focusPass}
@@ -449,7 +446,6 @@ useEffect(() => {
 				</button>
 			</div>
 
-			{/* clic n'importe où = focus sur l'input (comme avant) */}
 			<button
 				type="button"
 				onClick={focusPass}
