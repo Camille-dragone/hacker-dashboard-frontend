@@ -33,7 +33,7 @@ export default function IndiceLogin({ durationMs = 10_000, onDone }: IndiceLogin
         </h2>
 
         <p className="mt-3 text-sm text-green-100/80">
-          Observer les lettres affiché derrière l'écran.  
+          Observer les lettres affichées derrière l'écran.  
         </p>
 
         <div className="mt-5 flex items-center justify-between gap-3">

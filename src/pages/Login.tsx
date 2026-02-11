@@ -15,14 +15,28 @@ export default function Login() {
 	const EXPECTED_PASSWORD = "MaTrIx";
 	const [user] = useState("Camille-hacker");
 	const [pass, setPass] = useState("");
-	const [phase, setPhase] = useState<
-		"idle" | "verifying" | "granted" | "denied"
-	>("idle");
+	const [phase, setPhase] = useState<"idle" | "verifying" | "granted" | "denied">(
+		"idle",
+	);
 	const inputRef = useRef<HTMLInputElement | null>(null);
-
 	const [deniedFx, setDeniedFx] = useState(false);
 	const [showIndice, setShowIndice] = useState(true);
-	const [showPass, setShowPass] = useState(false);
+	const [showHint, setShowHint] = useState(false);
+	const [hintIndex, setHintIndex] = useState(0); 
+
+	const HINTS = [
+		"Les caractères rouges forment le mot de passe. Observe attentivement la séquence.",
+  		"Le mot de passe est sensible à la casse : respecte majuscules et minuscules.",
+ 		"La première lettre est « M ».",
+  		"Le mot de passe contient exactement trois majuscules.",
+  		"La dernière lettre est « x ».",
+		"Le mot de passe correspond au nom d'un film.",
+	] as const;
+
+	const openHint = () => {
+  	setShowHint(true);
+  	setHintIndex((i) => (i + 1) % HINTS.length);
+	};
 
 	const uiCfg = useMemo(
 		() => ({
@@ -39,6 +53,17 @@ export default function Login() {
 	useEffect(() => {
 		inputRef.current?.focus();
 	}, []);
+
+	useEffect(() => {
+		if (!showHint) return;
+
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setShowHint(false);
+		};
+
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [showHint]);
 
 	const canSubmit = pass.trim().length > 0 && phase === "idle";
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -72,10 +97,8 @@ export default function Login() {
 	const speedsRef = useRef<number[]>([]);
 	const colsRef = useRef(0);
 	const rowsRef = useRef(0);
-
 	const redDropsRef = useRef<RedDrop[]>([]);
 	const injectIndexRef = useRef(0);
-
 	const stressUntilRef = useRef<number>(0);
 
 	const submit = () => {
@@ -91,6 +114,7 @@ export default function Login() {
 				window.setTimeout(() => navigate("/dashboard"), uiCfg.grantedMs);
 				return;
 			}
+
 			stressUntilRef.current = Date.now() + uiCfg.stressMs;
 
 			setPhase("denied");
@@ -251,12 +275,42 @@ export default function Login() {
 
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-black font-mono">
-						{showIndice && (
-							<IndiceLogin 
-							durationMs = {10_000}
-							onDone= {() => setShowIndice (false)}
-							/>
-						)}
+			{showIndice && (
+				<IndiceLogin durationMs={10_000} onDone={() => setShowIndice(false)} />
+			)}
+
+			{showHint && (
+				<div
+					className="fixed inset-0 z-[300] flex items-center justify-center bg-black/70 p-4"
+					role="dialog"
+					aria-modal="true"
+					aria-label="Indice"
+					onMouseDown={(e) => {
+						if (e.target === e.currentTarget) setShowHint(false);
+					}}
+				>
+					<div className="w-full max-w-md rounded-2xl border border-green-500/20 bg-black/80 p-5 shadow-2xl backdrop-blur">
+						<div className="text-xs tracking-[0.35em] text-green-300/70">
+							INDICE N°{hintIndex + 1}
+						</div>
+
+						<div className="mt-3 font-mono text-sm text-green-100/85">
+							<span className="text-green-400">{">"}</span> {HINTS[hintIndex]}
+						</div>
+
+						<div className="mt-4 flex items-center justify-end gap-2">
+							<button
+								type="button"
+								onClick={() => setShowHint(false)}
+								className="rounded-xl border border-green-500/20 bg-green-500/10 px-3 py-2 text-xs text-green-200/80 hover:bg-green-500/15"
+							>
+								OK
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
 			<canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
 			<div
@@ -269,7 +323,7 @@ export default function Login() {
 			<div className="absolute inset-0 flex items-center justify-center p-6">
 				<div
 					className={[
-						"relative w-[min(520px,92vw)] rounded-2xl border bg-black/70 p-6 shadow-[0_0_90px_rgba(34,197,94,0.12)] backdrop-blur-[2px]",
+						"relative z-20 w-[min(520px,92vw)] rounded-2xl border bg-black/70 p-6 shadow-[0_0_90px_rgba(34,197,94,0.12)] backdrop-blur-[2px]",
 						phase === "denied"
 							? "border-red-500/35 shadow-[0_0_90px_rgba(239,68,68,0.16)]"
 							: "border-green-500/25",
@@ -290,16 +344,19 @@ export default function Login() {
 						<div className="flex items-center gap-3">
 							<span className="text-green-400">PASS</span>
 							<span className="text-green-200/60">:</span>
+
 							<span className="text-green-200">
 								{pass}
 								{phase === "idle" && <span className="animate-pulse">▌</span>}
 							</span>
-						<button 
-						type="button" 
-						onClick={() => setShowPass(true)} 
-						className="pointer-events-auto ml-auto rounded-lg border border-green-500/20 bg-green-500/10 px-2 py-1 text-[11px] tracking-widest text-green-200/80 hover:bg-green-500/15">
-							INDICE
-						</button>
+
+							<button
+								type="button"
+								onClick={openHint}
+								className="pointer-events-auto ml-auto rounded-lg border border-green-500/20 bg-green-500/10 px-2 py-1 text-[11px] tracking-widest text-green-200/80 hover:bg-green-500/15"
+							>
+								INDICE
+							</button>
 						</div>
 
 						<div className="mt-4 text-green-300/70">
@@ -370,7 +427,7 @@ export default function Login() {
 			<button
 				type="button"
 				onClick={() => inputRef.current?.focus()}
-				className="absolute inset-0 cursor-text"
+				className="absolute inset-0 z-10 cursor-text"
 				aria-label="Focus password input"
 			/>
 		</div>
