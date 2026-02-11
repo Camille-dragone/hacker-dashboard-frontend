@@ -169,7 +169,7 @@ export default function Matrix() {
 		<div className="relative h-screen w-screen bg-black">
 			{showIndice && (
 				<IndiceMatrix 
-				durationMs = {10_000}
+				durationMs = {5_000}
 				onDone= {() => setShowIndice (false)}
 				/>
 			)}

@@ -5,7 +5,7 @@ type IndiceLoginProps = {
   onDone?: () => void;
 };
 
-export default function IndiceLogin({ durationMs = 10_000, onDone }: IndiceLoginProps) {
+export default function IndiceLogin({ durationMs = 5_000, onDone }: IndiceLoginProps) {
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function IndiceLogin({ durationMs = 10_000, onDone }: IndiceLogin
         </div>
 
         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-green-500/10 ring-1 ring-inset ring-green-500/20">
-          <div className="h-full w-full origin-left animate-[scanBar_10s_linear_forwards] bg-green-400/30" />
+          <div className="h-full w-full origin-left animate-[scanBar_5s_linear_forwards] bg-green-400/30" />
         </div>
 
         <style>

@@ -5,7 +5,7 @@ type IndiceMatrixProps = {
   onDone?: () => void;
 };
 
-export default function IndiceMatrix({ durationMs = 10_000, onDone }: IndiceMatrixProps) {
+export default function IndiceMatrix({ durationMs = 5_000, onDone }: IndiceMatrixProps) {
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -39,17 +39,10 @@ export default function IndiceMatrix({ durationMs = 10_000, onDone }: IndiceMatr
         <div className="mt-5 flex items-center justify-between gap-3">
           <div className="font-mono text-xs text-green-200/70">
           </div>
-
-          {/*<div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-green-400/70" />
-            <span className="font-mono text-xs text-green-200/70">
-              AUTO-CLOSE: 10s
-            </span>
-          </div>*/}
         </div>
 
         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-green-500/10 ring-1 ring-inset ring-green-500/20">
-          <div className="h-full w-full origin-left animate-[scanBar_10s_linear_forwards] bg-green-400/30" />
+          <div className="h-full w-full origin-left animate-[scanBar_5s_linear_forwards] bg-green-400/30" />
         </div>
 
         <style>
