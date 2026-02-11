@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch } from "../lib/api";
 import { CARD_TITLE_CLASS, GlassCard } from "./DashboardShell";
 
@@ -192,15 +192,13 @@ function TerminalBody({
 
 			{started && loading && (
 				<div className="text-green-300/70">
-					<span className="text-green-400">{">"}</span> Synchronisation des
-					logs…
+					<span className="text-green-400">{">"}</span> Synchronisation des logs…
 				</div>
 			)}
 
 			{started && !loading && lines.length === 0 && (
 				<div className="text-green-300/70">
-					<span className="text-green-400">{">"}</span> Aucun log pour
-					l’instant.
+					<span className="text-green-400">{">"}</span> Aucun log pour l’instant.
 				</div>
 			)}
 
@@ -226,7 +224,11 @@ function TerminalBody({
 	);
 }
 
-export function TerminalCard() {
+export function TerminalCard({
+	onTargetsChanged,
+}: {
+	onTargetsChanged?: () => void;
+}) {
 	const [lines, setLines] = useState<TerminalLine[]>([]);
 	const [queue, setQueue] = useState<LogOut[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -234,7 +236,11 @@ export function TerminalCard() {
 
 	const [entreprises, setEntreprises] = useState<EntrepriseOption[]>([]);
 	const [targetId, setTargetId] = useState<number | null>(null);
-	const [targetLabel, setTargetLabel] = useState<string>("");
+
+	const targetLabel = useMemo(() => {
+		if (targetId == null) return "";
+		return entreprises.find((x) => x.id === targetId)?.label ?? "";
+	}, [entreprises, targetId]);
 
 	const runIdRef = useRef(0);
 	const startedRef = useRef(false);
@@ -250,6 +256,9 @@ export function TerminalCard() {
 	useEffect(() => {
 		linesRef.current = lines;
 	}, [lines]);
+
+	const refreshAfterEndRef = useRef(false);
+	const END_MARKER = "STATUS ▸";
 
 	const startLogs = () => {
 		if (startedRef.current) return;
@@ -272,6 +281,7 @@ export function TerminalCard() {
 			localStorage.removeItem(`cinema_autorun_done_${targetId}`);
 		}
 
+		refreshAfterEndRef.current = false;
 		startedRef.current = false;
 	};
 
@@ -295,6 +305,8 @@ export function TerminalCard() {
 					.sort((a, b) => a.label.localeCompare(b.label));
 
 				setEntreprises(opts);
+
+				setTargetId((prev) => (prev != null && !opts.some((o) => o.id === prev) ? null : prev));
 			} catch {
 				if (!cancelled) setEntreprises([]);
 			}
@@ -308,8 +320,6 @@ export function TerminalCard() {
 
 	const pickTarget = (id: number | null) => {
 		setTargetId(id);
-		const label = id ? (entreprises.find((x) => x.id === id)?.label ?? "") : "";
-		setTargetLabel(label);
 	};
 
 	useEffect(() => {
@@ -325,6 +335,7 @@ export function TerminalCard() {
 			.finally(() => {
 				if (runId !== runIdRef.current) return;
 				localStorage.setItem(key, "1");
+				refreshAfterEndRef.current = true;
 			});
 	}, [started, targetId]);
 
@@ -345,9 +356,7 @@ export function TerminalCard() {
 				if (runId !== runIdRef.current) return;
 
 				const asc = [...initial].sort((a, b) => a.id - b.id);
-				for (const l of asc) {
-					seenIdsRef.current.add(l.id);
-				}
+				for (const l of asc) seenIdsRef.current.add(l.id);
 				setQueue(asc);
 			} finally {
 				if (!cancelled && runId === runIdRef.current) setLoading(false);
@@ -369,7 +378,9 @@ export function TerminalCard() {
 
 		const interval = window.setInterval(async () => {
 			try {
-				const fresh = await apiFetch<LogOut[]>(`/entreprises/${targetId}/logs`);
+				const fresh = await apiFetch<LogOut[]>(
+					`/entreprises/${targetId}/logs`,
+				);
 				if (cancelled) return;
 				if (runId !== runIdRef.current) return;
 
@@ -377,9 +388,7 @@ export function TerminalCard() {
 				const filtered = asc.filter((l) => !seenIdsRef.current.has(l.id));
 				if (filtered.length === 0) return;
 
-				for (const l of filtered) {
-					seenIdsRef.current.add(l.id);
-				}
+				for (const l of filtered) seenIdsRef.current.add(l.id);
 				setQueue((prev) => [...prev, ...filtered]);
 			} catch {}
 		}, 1200);
@@ -390,8 +399,8 @@ export function TerminalCard() {
 		};
 	}, [started, targetId]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: keep same behavior
-	useEffect(() => {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+		useEffect(() => {
 		if (!started) return;
 
 		setLines((prev) => {
@@ -417,7 +426,7 @@ export function TerminalCard() {
 
 			return [...prev, newLine].slice(-120);
 		});
-	}, [queue, started, targetId, targetLabel]);
+	}, [started, queue.length]);
 
 	useEffect(() => {
 		if (!started) return;
@@ -442,6 +451,11 @@ export function TerminalCard() {
 			const nextCharIndex = line.typed.length;
 
 			if (nextCharIndex >= line.full.length) {
+				if (line.full.includes(END_MARKER) && refreshAfterEndRef.current) {
+					refreshAfterEndRef.current = false;
+					onTargetsChanged?.();
+				}
+
 				setLines((prev) => {
 					const i = prev.findIndex((x) => x.id === line.id);
 					if (i === -1) return prev;
@@ -486,7 +500,7 @@ export function TerminalCard() {
 			cancelled = true;
 			if (timer) window.clearTimeout(timer);
 		};
-	}, [lines, started]);
+	}, [lines, started, onTargetsChanged]);
 
 	return (
 		<GlassCard className="w-full max-w-[1800px]">

@@ -34,6 +34,18 @@ export default function Sidebar() {
 				>
 					Targets
 				</NavLink>
+				<NavLink 
+					to="/logout"
+										className={({ isActive }) =>
+						`rounded-md px-4 py-3 text-sm font-medium tracking-wide transition ${
+							isActive
+								? "bg-green-500/10 text-green-400"
+								: "text-green-300 hover:bg-green-500/5 hover:text-green-200"
+						}`
+					}
+				>
+					Déconnexion
+				</NavLink>
 			</nav>
 		</aside>
 	);

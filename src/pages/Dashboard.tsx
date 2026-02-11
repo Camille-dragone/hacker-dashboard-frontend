@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { StatCard } from "../component/StatCard";
 import { type PieDatum, StatusPieCard } from "../component/StatusPieCard";
 import { TerminalCard } from "../component/TerminalCard";
@@ -35,33 +35,24 @@ export default function Dashboard() {
 	const [statsA, setStatsA] = useState<StatsActivite | null>(null);
 	const [err, setErr] = useState<string | null>(null);
 
-	useEffect(() => {
-		let cancelled = false;
-
-		async function load() {
-			try {
-				const [e, a] = await Promise.all([
-					apiFetch<StatsEntreprises>("/stats/entreprises"),
-					apiFetch<StatsActivite>("/stats/activite"),
-				]);
-
-				if (!cancelled) {
-					setStatsE(e);
-					setStatsA(a);
-				}
-			} catch (e: unknown) {
-				if (!cancelled) {
-					const message = e instanceof Error ? e.message : "Erreur inconnue";
-					setErr(message);
-				}
-			}
+	const reload = useCallback(async () => {
+		setErr(null);
+		try {
+			const [e, a] = await Promise.all([
+				apiFetch<StatsEntreprises>("/stats/entreprises"),
+				apiFetch<StatsActivite>("/stats/activite"),
+			]);
+			setStatsE(e);
+			setStatsA(a);
+		} catch (e: unknown) {
+			const message = e instanceof Error ? e.message : "Erreur inconnue";
+			setErr(message);
 		}
-
-		void load();
-		return () => {
-			cancelled = true;
-		};
 	}, []);
+
+	useEffect(() => {
+		void reload();
+	}, [reload]);
 
 	const counts = useMemo(() => {
 		const parStatut = statsE?.par_statut ?? {};
@@ -126,8 +117,7 @@ export default function Dashboard() {
 							</div>
 
 							<div className="mt-1 text-xs text-green-300/70">
-								Dernière action :{" "}
-								{formatTime(statsA?.dernier_log.created_at ?? null)}
+								Dernière action : {formatTime(statsA?.dernier_log.created_at ?? null)}
 							</div>
 						</div>
 					</div>
@@ -175,7 +165,8 @@ export default function Dashboard() {
 					</div>
 
 					<div className="flex justify-center">
-						<TerminalCard />
+						{/* ✅ quand le terminal finit, on reload les stats */}
+						<TerminalCard onTargetsChanged={() => void reload()} />
 					</div>
 				</div>
 			</div>

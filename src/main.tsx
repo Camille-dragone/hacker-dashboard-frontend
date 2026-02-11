@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 
 import Matrix from "./pages/Matrix";
 import Target from "./pages/Target";
+import Logout from "./pages/Logout";
 
 const router = createBrowserRouter([
 	{ path: "/", element: <Matrix /> },
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
 		children: [
 			{ path: "/dashboard", element: <Dashboard /> },
 			{ path: "/targets", element: <Target /> },
+			{path: "/logout", element:  <Logout/>}
 		],
 	},
 ]);

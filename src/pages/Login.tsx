@@ -4,9 +4,9 @@ import IndiceLogin from "../component/IndiceLogin";
 
 type RedDrop = {
 	char: string;
-	col: number;
-	y: number;
-	speed: number;
+	col: number; 
+	y: number; 
+	speed: number; 
 };
 
 export default function Login() {
@@ -25,7 +25,6 @@ export default function Login() {
 	}, []);
 
 	const [deniedFx, setDeniedFx] = useState(false);
-
 	const [showIndice, setShowIndice] = useState(true);
 
 	const [showHint, setShowHint] = useState(false);
@@ -61,6 +60,7 @@ export default function Login() {
 		}),
 		[],
 	);
+
 	useEffect(() => {
 		focusPass();
 	}, [focusPass]);
@@ -81,11 +81,13 @@ export default function Login() {
 
 	const matrixCfg = useMemo(
 		() => ({
-			fontSize: 36,
+			greenFontSize: 24, 
+			redFontSize: 38,
+
 			fade: 0.035,
 
-			greenSpeedMin: 0.08,
-			greenSpeedMax: 0.18,
+			greenSpeedMin: 0.9,
+			greenSpeedMax: 2.2,
 
 			redSpeedMin: 0.012,
 			redSpeedMax: 0.025,
@@ -108,10 +110,12 @@ export default function Login() {
 	const speedsRef = useRef<number[]>([]);
 	const colsRef = useRef(0);
 	const rowsRef = useRef(0);
+
 	const redDropsRef = useRef<RedDrop[]>([]);
 	const injectIndexRef = useRef(0);
-	const stressUntilRef = useRef<number>(0);
 	const cycleSpeedRef = useRef<number | null>(null);
+
+	const stressUntilRef = useRef<number>(0);
 
 	const submit = () => {
 		if (!canSubmit) return;
@@ -168,18 +172,14 @@ export default function Login() {
 
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-			const cols = Math.floor(w / matrixCfg.fontSize);
-			const rows = Math.floor(h / matrixCfg.fontSize);
+			const cols = Math.max(1, Math.floor(w / matrixCfg.greenFontSize));
+			const rows = Math.max(1, Math.floor(h / matrixCfg.greenFontSize));
 
-			colsRef.current = Math.max(1, cols);
-			rowsRef.current = Math.max(1, rows);
+			colsRef.current = cols;
+			rowsRef.current = rows;
 
-			dropsRef.current = Array.from(
-				{ length: colsRef.current },
-				() => Math.random() * rowsRef.current,
-			);
-
-			speedsRef.current = Array.from({ length: colsRef.current }, () =>
+			dropsRef.current = Array.from({ length: cols }, () => Math.random() * rows);
+			speedsRef.current = Array.from({ length: cols }, () =>
 				rand(matrixCfg.greenSpeedMin, matrixCfg.greenSpeedMax),
 			);
 		};
@@ -191,10 +191,7 @@ export default function Login() {
 			if (colsRef.current <= 0) return;
 
 			if (injectIndexRef.current === 0) {
-				cycleSpeedRef.current = rand(
-					matrixCfg.redSpeedMin,
-					matrixCfg.redSpeedMax,
-				);
+				cycleSpeedRef.current = rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax);
 			}
 
 			const idx = injectIndexRef.current;
@@ -202,8 +199,8 @@ export default function Login() {
 
 			redDropsRef.current.push({
 				char,
-				col: Math.floor(Math.random() * colsRef.current),
-				y: -4,
+				col: Math.floor(Math.random() * colsRef.current), 
+				y: -4, 
 				speed:
 					cycleSpeedRef.current ??
 					rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax),
@@ -235,30 +232,25 @@ export default function Login() {
 				? Math.min(0.28, matrixCfg.fade * matrixCfg.stressFadeMul)
 				: matrixCfg.fade;
 
-			const speedMul = stress ? matrixCfg.stressSpeedMul : 1;
-
 			ctx.fillStyle = `rgba(0,0,0,${fade})`;
 			ctx.fillRect(0, 0, w, h);
-
-			ctx.font = `${matrixCfg.fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 
 			const cols = colsRef.current;
 			const rows = rowsRef.current;
 
+			ctx.font = `${matrixCfg.greenFontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 			ctx.fillStyle = matrixCfg.green;
+
 			for (let col = 0; col < cols; col++) {
 				const row = Math.floor(dropsRef.current[col]);
-
-				const x = Math.round(col * matrixCfg.fontSize);
-				const y = Math.round(row * matrixCfg.fontSize);
+				const x = col * matrixCfg.greenFontSize;
+				const y = row * matrixCfg.greenFontSize;
 
 				ctx.fillText(Math.random() < 0.5 ? "0" : "1", x, y);
 
-				dropsRef.current[col] += speedsRef.current[col] * speedMul;
+				dropsRef.current[col] += speedsRef.current[col];
 
-				const respawnChance = stress ? 0.94 : 0.992;
-
-				if (dropsRef.current[col] > rows && Math.random() > respawnChance) {
+				if (dropsRef.current[col] > rows && Math.random() > 0.975) {
 					dropsRef.current[col] = 0;
 					speedsRef.current[col] = rand(
 						matrixCfg.greenSpeedMin,
@@ -267,12 +259,14 @@ export default function Login() {
 				}
 			}
 
+			ctx.font = `${matrixCfg.redFontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 			ctx.fillStyle = matrixCfg.red;
+
 			for (const d of redDropsRef.current) {
 				d.y += d.speed * (stress ? 1.9 : 1);
 
-				const x = Math.round(d.col * matrixCfg.fontSize);
-				const y = Math.round(Math.floor(d.y) * matrixCfg.fontSize);
+				const x = d.col * matrixCfg.greenFontSize;
+				const y = Math.floor(d.y) * matrixCfg.greenFontSize;
 
 				ctx.fillText(d.char, x, y);
 			}
