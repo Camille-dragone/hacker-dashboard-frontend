@@ -81,14 +81,14 @@ export default function Login() {
 
 	const matrixCfg = useMemo(
 		() => ({
-			fontSize: 28,
+			fontSize: 36,
 			fade: 0.035,
 
 			greenSpeedMin: 0.08,
 			greenSpeedMax: 0.18,
 
-			redSpeedMin: 0.025,
-			redSpeedMax: 0.045,
+			redSpeedMin: 0.012,
+			redSpeedMax: 0.025,
 
 			stressSpeedMul: 10.0,
 			stressFadeMul: 3.1,
@@ -111,6 +111,7 @@ export default function Login() {
 	const redDropsRef = useRef<RedDrop[]>([]);
 	const injectIndexRef = useRef(0);
 	const stressUntilRef = useRef<number>(0);
+	const cycleSpeedRef = useRef<number | null>(null);
 
 	const submit = () => {
 		if (!canSubmit) return;
@@ -186,30 +187,36 @@ export default function Login() {
 		resize();
 		window.addEventListener("resize", resize);
 
-		const injectTimer = window.setInterval(() => {
-			if (colsRef.current <= 0) return;
+const injectTimer = window.setInterval(() => {
+	if (colsRef.current <= 0) return;
 
-			if (injectIndexRef.current >= matrixCfg.injectedPassword.length) {
-				injectIndexRef.current = 0;
-			}
+	if (injectIndexRef.current === 0) {
+		cycleSpeedRef.current = rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax);
+	}
 
-			const char = matrixCfg.injectedPassword[injectIndexRef.current];
-			injectIndexRef.current += 1;
+	const idx = injectIndexRef.current;
+	const char = matrixCfg.injectedPassword[idx];
 
-			redDropsRef.current.push({
-				char,
-				col: Math.floor(Math.random() * colsRef.current),
-				y: -2 - Math.random() * 6,
-				speed: rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax),
-			});
+	redDropsRef.current.push({
+		char,
+		col: Math.floor(Math.random() * colsRef.current),
+		y: -4,
+		speed: cycleSpeedRef.current ?? rand(matrixCfg.redSpeedMin, matrixCfg.redSpeedMax),
+	});
 
-			if (redDropsRef.current.length > matrixCfg.maxRedDrops) {
-				redDropsRef.current.splice(
-					0,
-					redDropsRef.current.length - matrixCfg.maxRedDrops,
-				);
-			}
-		}, matrixCfg.injectEveryMs);
+	injectIndexRef.current += 1;
+
+	if (injectIndexRef.current >= matrixCfg.injectedPassword.length) {
+		injectIndexRef.current = 0;
+	}
+
+	if (redDropsRef.current.length > matrixCfg.maxRedDrops) {
+		redDropsRef.current.splice(
+			0,
+			redDropsRef.current.length - matrixCfg.maxRedDrops,
+		);
+	}
+}, matrixCfg.injectEveryMs);
 
 		let raf = 0;
 

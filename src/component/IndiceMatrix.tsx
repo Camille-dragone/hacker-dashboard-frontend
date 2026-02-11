@@ -35,7 +35,7 @@ export default function IndiceMatrix({
 				</h2>
 
 				<p className="mt-3 text-sm text-green-100/80">
-					Sélectionne une cible pour identifier les points d’accès exploitables.
+					Sélectionne une cible pour identifier le point d'accès.
 				</p>
 
 				<div className="mt-5 flex items-center justify-between gap-3">
