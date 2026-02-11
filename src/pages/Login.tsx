@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import IndiceLogin from "../component/IndiceLogin";
 
 type RedDrop = {
 	char: string;
@@ -11,7 +12,7 @@ type RedDrop = {
 export default function Login() {
 	const navigate = useNavigate();
 
-	const EXPECTED_PASSWORD = "a9F#3KxQ";
+	const EXPECTED_PASSWORD = "MaTrIx";
 	const [user] = useState("Camille-hacker");
 	const [pass, setPass] = useState("");
 	const [phase, setPhase] = useState<
@@ -20,6 +21,8 @@ export default function Login() {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
 	const [deniedFx, setDeniedFx] = useState(false);
+	const [showIndice, setShowIndice] = useState(true);
+	const [showPass, setShowPass] = useState(false);
 
 	const uiCfg = useMemo(
 		() => ({
@@ -57,7 +60,7 @@ export default function Login() {
 			green: "#50FFA0",
 			red: "#FF3C3C",
 
-			injectedPassword: "a9F#3KxQ",
+			injectedPassword: "MaTrIx",
 			injectEveryMs: 1100,
 
 			maxRedDrops: 180,
@@ -248,6 +251,12 @@ export default function Login() {
 
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-black font-mono">
+						{showIndice && (
+							<IndiceLogin 
+							durationMs = {10_000}
+							onDone= {() => setShowIndice (false)}
+							/>
+						)}
 			<canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
 			<div
@@ -285,6 +294,12 @@ export default function Login() {
 								{pass}
 								{phase === "idle" && <span className="animate-pulse">▌</span>}
 							</span>
+						<button 
+						type="button" 
+						onClick={() => setShowPass(true)} 
+						className="pointer-events-auto ml-auto rounded-lg border border-green-500/20 bg-green-500/10 px-2 py-1 text-[11px] tracking-widest text-green-200/80 hover:bg-green-500/15">
+							INDICE
+						</button>
 						</div>
 
 						<div className="mt-4 text-green-300/70">

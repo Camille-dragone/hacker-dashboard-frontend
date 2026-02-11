@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef,  useState } from "react";
 import { useNavigate } from "react-router-dom";
+import  IndiceMatrix  from "../component/IndiceMatrix" 
 
 type Hot = { col: number; y: number };
 
 export default function Matrix() {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const navigate = useNavigate();
+	const [showIndice, setShowIndice] = useState(true);
 
 	const cfg = useMemo(
 		() => ({
@@ -165,6 +167,12 @@ export default function Matrix() {
 
 	return (
 		<div className="relative h-screen w-screen bg-black">
+			{showIndice && (
+				<IndiceMatrix 
+				durationMs = {10_000}
+				onDone= {() => setShowIndice (false)}
+				/>
+			)}
 			<canvas
 				ref={canvasRef}
 				onClick={onClick}
