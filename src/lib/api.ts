@@ -1,21 +1,32 @@
-const API_URL = import.meta.env.VITE_API_URL as string;
-
-export async function apiFetch<T>(
-	path: string,
-	options: RequestInit = {},
+export async function apiFetch<T = unknown>(
+  path: string,
+  init?: RequestInit,
 ): Promise<T> {
-	const res = await fetch(`${API_URL}${path}`, {
-		headers: {
-			"Content-Type": "application/json",
-			...(options.headers || {}),
-		},
-		...options,
-	});
+  const base = import.meta.env.VITE_API_URL ?? "";
+  const url = path.startsWith("http") ? path : `${base}${path}`;
 
-	if (!res.ok) {
-		const text = await res.text();
-		throw new Error(text || `Erreur API ${res.status}`);
-	}
+  const res = await fetch(url, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init?.headers ?? {}),
+    },
+  });
 
-	return res.json() as Promise<T>;
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status} ${res.statusText} — ${txt}`);
+  }
+
+  if (res.status === 204) return undefined as T;
+
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    return (await res.text()) as unknown as T;
+  }
+
+  const raw = await res.text();
+  if (!raw) return undefined as T;
+
+  return JSON.parse(raw) as T;
 }
