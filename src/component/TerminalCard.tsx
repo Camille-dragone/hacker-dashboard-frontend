@@ -38,6 +38,9 @@ function typeColor(t: LogType) {
 	return "text-green-300/85";
 }
 
+const SPEED = 3;
+const MIN_DELAY_MS = 6;
+
 function nextDelayForChar(ch: string) {
 	let ms = 18 + Math.random() * 55;
 
@@ -48,7 +51,9 @@ function nextDelayForChar(ch: string) {
 
 	if (Math.random() < 0.03) ms += 120 + Math.random() * 240;
 
-	return ms;
+	ms = ms / SPEED;
+
+	return Math.max(MIN_DELAY_MS, ms);
 }
 
 function TerminalHeader({
@@ -393,7 +398,7 @@ export function TerminalCard({
 				for (const l of filtered) seenIdsRef.current.add(l.id);
 				setQueue((prev) => [...prev, ...filtered]);
 			} catch {}
-		}, 1200);
+		}, 500);
 
 		return () => {
 			cancelled = true;
@@ -467,7 +472,8 @@ export function TerminalCard({
 				});
 				setQueue((q) => q.slice(1));
 
-				timer = window.setTimeout(tick, 90 + Math.random() * 140);
+				const between = Math.max(12, (90 + Math.random() * 140) / SPEED);
+				timer = window.setTimeout(tick, between);
 				return;
 			}
 
@@ -482,9 +488,12 @@ export function TerminalCard({
 				const current = updated[i];
 				if (current.done) return prev;
 
+				const baseStep = Math.max(1, Math.floor(1 + SPEED / 2));
+				const step = ch === " " ? Math.max(2, baseStep) : baseStep;
+
 				updated[i] = {
 					...current,
-					typed: current.full.slice(0, current.typed.length + 1),
+					typed: current.full.slice(0, current.typed.length + step),
 				};
 
 				queueMicrotask(scrollToBottom);
@@ -495,7 +504,7 @@ export function TerminalCard({
 		};
 
 		if (lines.some((x) => !x.done)) {
-			timer = window.setTimeout(tick, 120);
+			timer = window.setTimeout(tick, Math.max(12, 120 / SPEED));
 		}
 
 		return () => {
@@ -505,7 +514,7 @@ export function TerminalCard({
 	}, [lines, started, onTargetsChanged]);
 
 	return (
-		<GlassCard className="w-full max-w-[1800px]">
+		<GlassCard className="w-full max-w-[2000px]">
 			<div className="p-6">
 				<TerminalHeader
 					started={started}

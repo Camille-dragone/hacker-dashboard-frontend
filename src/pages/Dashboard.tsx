@@ -162,12 +162,12 @@ export default function Dashboard() {
 					/>
 				</div>
 
-				<div className="mt-20 grid grid-cols-1 gap-6 xl:grid-cols-2 xl:items-start">
-					<div className="flex justify-start">
+				<div className="mt-20 grid grid-cols-1 gap-14 xl:grid-cols-12 xl:items-start">
+					<div className="xl:col-span-4">
 						<StatusPieCard data={pieData} />
 					</div>
 
-					<div className="flex justify-center">
+					<div className="xl:col-span-8">
 						<TerminalCard onTargetsChanged={() => void reload()} />
 					</div>
 				</div>
